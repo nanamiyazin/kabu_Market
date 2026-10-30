@@ -58,7 +58,7 @@ public final class KabuMenu implements InventoryHolder {
         MarketClock.Moment m = svc.now();
         Market market = plugin.market();
         int bundle = plugin.bundleSize();
-        long balance = plugin.wallets().get(player.getUniqueId());
+        double balance = svc.balance(player);
         int fresh = plugin.items().countFresh(player.getInventory(), m.weekId());
 
         ItemStack filler = icon(Material.GRAY_STAINED_GLASS_PANE, " ", List.of());
@@ -69,21 +69,21 @@ public final class KabuMenu implements InventoryHolder {
 
         // 売買ボタン
         if (m.isSundayMorning()) {
-            int price = market.priceAt(0);
+            double unit = plugin.unitPrice(market.priceAt(0));
             button(11, Material.BEETROOT, "<green>カブを " + bundle + "個 買う",
-                    List.of("<gray>" + Msg.bells((long) price * bundle)), p -> svc.buy(p, bundle));
+                    List.of("<gray>" + plugin.money(unit * bundle)), p -> svc.buy(p, bundle));
             button(13, Material.BEETROOT, "<green>カブを " + bundle * 10 + "個 買う",
-                    List.of("<gray>" + Msg.bells((long) price * bundle * 10)), p -> svc.buy(p, bundle * 10));
+                    List.of("<gray>" + plugin.money(unit * bundle * 10)), p -> svc.buy(p, bundle * 10));
             button(15, Material.HAY_BLOCK, "<gold>買えるだけ買う",
-                    List.of("<gray>所持ベルと持ち物の空きの分だけ"), p -> svc.buy(p, -1));
+                    List.of("<gray>所持金と持ち物の空きの分だけ"), p -> svc.buy(p, -1));
         } else if (!m.isSunday()) {
-            int price = market.priceAt(m.slot());
+            double unit = plugin.unitPrice(market.priceAt(m.slot()));
             button(11, Material.GOLD_NUGGET, "<yellow>カブを " + bundle + "個 売る",
-                    List.of("<gray>+" + Msg.bells((long) price * Math.min(bundle, fresh))), p -> svc.sell(p, bundle));
+                    List.of("<gray>+" + plugin.money(unit * Math.min(bundle, fresh))), p -> svc.sell(p, bundle));
             button(13, Material.GOLD_INGOT, "<yellow>カブを 64個 売る",
-                    List.of("<gray>+" + Msg.bells((long) price * Math.min(64, fresh))), p -> svc.sell(p, 64));
+                    List.of("<gray>+" + plugin.money(unit * Math.min(64, fresh))), p -> svc.sell(p, 64));
             button(15, Material.GOLD_BLOCK, "<gold>全部売る",
-                    List.of("<gray>" + Msg.num(fresh) + "個 → +" + Msg.bells((long) price * fresh)),
+                    List.of("<gray>" + Msg.num(fresh) + "個 → +" + plugin.money(unit * fresh)),
                     p -> svc.sell(p, -1));
         } else {
             ItemStack closed = icon(Material.BARRIER, "<red>営業時間外",
@@ -91,33 +91,24 @@ public final class KabuMenu implements InventoryHolder {
             inventory.setItem(13, closed);
         }
 
-        // 財布と両替
-        int bpe = plugin.bellsPerEmerald();
-        button(18, Material.EMERALD, "<green>エメラルドを1個 入金",
-                List.of("<gray>+" + Msg.bells(bpe)), p -> plugin.service().deposit(p, 1));
-        button(19, Material.EMERALD_BLOCK, "<green>エメラルドを全部 入金",
-                List.of("<gray>1個 = " + Msg.bells(bpe)), p -> plugin.service().deposit(p, -1));
-        inventory.setItem(22, icon(Material.SUNFLOWER, "<gold>財布: " + Msg.bells(balance),
-                List.of("<gray>エメラルドと両替できる")));
-        button(25, Material.EMERALD, "<aqua>1個 引き出す",
-                List.of("<gray>-" + Msg.bells(bpe)), p -> plugin.service().withdraw(p, 1));
-        button(26, Material.EMERALD, "<aqua>10個 引き出す",
-                List.of("<gray>-" + Msg.bells(bpe * 10L)), p -> plugin.service().withdraw(p, 10));
+        // 所持金
+        inventory.setItem(22, icon(Material.SUNFLOWER, "<gold>所持金: " + plugin.money(balance),
+                List.of("<gray>サーバーの経済プラグインのお金")));
     }
 
     private ItemStack infoIcon(MarketClock.Moment m, Market market, int fresh) {
         List<String> lore = new ArrayList<>();
         lore.add("<gray>今: <white>" + MarketClock.slotName(m.slot()));
         if (m.isSundayMorning()) {
-            lore.add("<gray>ウリの販売価格: <yellow>" + market.priceAt(0) + "ベル");
+            lore.add("<gray>ウリの販売価格: <yellow>" + plugin.priceText(market.priceAt(0)));
         } else if (!m.isSunday()) {
-            lore.add("<gray>今の買取価格: <yellow>" + market.priceAt(m.slot()) + "ベル");
-            lore.add("<gray>今週の購入価格: <white>" + market.priceAt(0) + "ベル");
+            lore.add("<gray>今の買取価格: <yellow>" + plugin.priceText(market.priceAt(m.slot())));
+            lore.add("<gray>今週の購入価格: <white>" + plugin.priceText(market.priceAt(0)));
         }
         lore.add("<gray>売れるカブ: <white>" + Msg.num(fresh) + "個");
         lore.add("");
         lore.add("<dark_aqua>今週のカブ価");
-        lore.addAll(KabuPlugin.weekChart(market, m, false));
+        lore.addAll(plugin.weekChart(m, false));
         return icon(Material.CLOCK, "<yellow>カブ価情報", lore);
     }
 

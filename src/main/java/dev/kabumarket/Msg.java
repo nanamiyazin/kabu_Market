@@ -29,11 +29,14 @@ public final class Msg {
         return MM.deserialize(mini).decoration(TextDecoration.ITALIC, false);
     }
 
-    public static String bells(long v) {
-        return NumberFormat.getIntegerInstance(Locale.JAPAN).format(v) + "ベル";
-    }
-
     public static String num(long v) {
         return NumberFormat.getIntegerInstance(Locale.JAPAN).format(v);
+    }
+
+    /** 整数ならそのまま、小数があれば小数2桁まで */
+    public static String num(double v) {
+        NumberFormat f = NumberFormat.getNumberInstance(Locale.JAPAN);
+        f.setMaximumFractionDigits(2);
+        return f.format(v);
     }
 }

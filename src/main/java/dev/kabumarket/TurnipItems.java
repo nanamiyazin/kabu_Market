@@ -37,7 +37,7 @@ public final class TurnipItems {
                     Msg.item("<gray>ウリから買ったカブ。"),
                     Msg.item("<gray>月〜土に <yellow>/kabu</yellow> で売れる。"),
                     Msg.item("<red>次の日曜日になると腐ってしまう！"),
-                    Msg.item("<dark_gray>購入価格: " + boughtPrice + "ベル")
+                    Msg.item("<dark_gray>購入時のカブ価: " + boughtPrice)
             ));
             PersistentDataContainer pdc = meta.getPersistentDataContainer();
             pdc.set(typeKey, PersistentDataType.STRING, TYPE_TURNIP);

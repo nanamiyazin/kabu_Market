@@ -16,9 +16,11 @@ game-world: world
 # 1日(24000tick)のうち、この tick 以降を「午後」とする（6000 = 正午）
 game-pm-tick: 6000
 
-# お金（ベル）
-# エメラルド1個 = 何ベルか（/kabu deposit, /kabu withdraw で両替）
-bells-per-emerald: 100
+# お金は Vault 経由で経済プラグイン（EssentialsX など）のものを使う
+# カブ価（90〜660くらいの数値）にこの倍率を掛けた金額で売買する
+#   1.0 → カブ1個 = 約100（あつ森のベルと同じ感覚）
+#   0.1 → カブ1個 = 約10（お金の価値が高いサーバー向け）
+price-multiplier: 1.0
 
 # カブは何個単位で買うか（あつ森は10個単位）
 bundle-size: 10

@@ -4,11 +4,13 @@ main: dev.kabumarket.KabuPlugin
 api-version: '26.1'
 description: あつまれどうぶつの森風のカブ売買システム
 authors: [KabuMarket]
+# お金は Vault 経由で経済プラグイン（EssentialsX など）のものを使う
+depend: [Vault]
 
 commands:
   kabu:
     description: カブ市場を開く
-    usage: /kabu [price|buy|sell|balance|deposit|withdraw|help]
+    usage: /kabu [price|buy|sell|balance|help]
     aliases: [turnip, kabuka]
     permission: kabu.use
 
