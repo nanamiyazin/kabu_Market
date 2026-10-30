@@ -1,0 +1,27 @@
+# ===== KabuMarket 設定 =====
+
+# 時間の進み方
+#   REAL : 現実の曜日・時刻で進む（あつ森と同じ。日曜午前に買い、月〜土に売る）
+#   GAME : マイクラ内の日数で進む（ゲーム内7日 = 1週間）
+time-mode: REAL
+
+# REAL モード用
+timezone: Asia/Tokyo
+# この時刻(時)以降を「午後」とする
+real-pm-hour: 12
+
+# GAME モード用
+# 日数を数えるワールド名
+game-world: world
+# 1日(24000tick)のうち、この tick 以降を「午後」とする（6000 = 正午）
+game-pm-tick: 6000
+
+# お金（ベル）
+# エメラルド1個 = 何ベルか（/kabu deposit, /kabu withdraw で両替）
+bells-per-emerald: 100
+
+# カブは何個単位で買うか（あつ森は10個単位）
+bundle-size: 10
+
+# 価格が更新されたとき全員にお知らせする
+announce-price-change: true

@@ -1,0 +1,21 @@
+name: KabuMarket
+version: '${version}'
+main: dev.kabumarket.KabuPlugin
+api-version: '26.1'
+description: あつまれどうぶつの森風のカブ売買システム
+authors: [KabuMarket]
+
+commands:
+  kabu:
+    description: カブ市場を開く
+    usage: /kabu [price|buy|sell|balance|deposit|withdraw|help]
+    aliases: [turnip, kabuka]
+    permission: kabu.use
+
+permissions:
+  kabu.use:
+    description: カブの売買を行える
+    default: true
+  kabu.admin:
+    description: カブ市場の管理コマンドを使える
+    default: op
