@@ -1,0 +1,17 @@
+-Xmaxerrs
+2000
+-cp
+/tmp/claude-0/-home-claude/d962b764-8761-5019-aa68-167b506de69f/scratchpad/vault/vault.jar
+-d
+/tmp/claude-0/-home-claude/d962b764-8761-5019-aa68-167b506de69f/scratchpad/out4
+src/main/java/dev/kabumarket/KabuMenu.java
+src/main/java/dev/kabumarket/TurnipItems.java
+src/main/java/dev/kabumarket/KabuListener.java
+src/main/java/dev/kabumarket/Msg.java
+src/main/java/dev/kabumarket/KabuService.java
+src/main/java/dev/kabumarket/KabuPlugin.java
+src/main/java/dev/kabumarket/KabuCommand.java
+src/main/java/dev/kabumarket/market/MarketClock.java
+src/main/java/dev/kabumarket/market/Market.java
+src/main/java/dev/kabumarket/market/PriceGenerator.java
+src/main/java/dev/kabumarket/market/PricePattern.java

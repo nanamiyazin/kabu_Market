@@ -67,29 +67,45 @@ public final class KabuMenu implements InventoryHolder {
         // 情報（中央上）
         inventory.setItem(4, infoIcon(m, market, fresh));
 
-        // 売買ボタン
-        if (m.isSundayMorning()) {
-            double unit = plugin.unitPrice(market.priceAt(0));
-            button(11, Material.BEETROOT, "<green>カブを " + bundle + "個 買う",
-                    List.of("<gray>" + plugin.money(unit * bundle)), p -> svc.buy(p, bundle));
-            button(13, Material.BEETROOT, "<green>カブを " + bundle * 10 + "個 買う",
-                    List.of("<gray>" + plugin.money(unit * bundle * 10)), p -> svc.buy(p, bundle * 10));
-            button(15, Material.HAY_BLOCK, "<gold>買えるだけ買う",
-                    List.of("<gray>所持金と持ち物の空きの分だけ"), p -> svc.buy(p, -1));
-        } else if (!m.isSunday()) {
-            double unit = plugin.unitPrice(market.priceAt(m.slot()));
-            button(11, Material.GOLD_NUGGET, "<yellow>カブを " + bundle + "個 売る",
-                    List.of("<gray>+" + plugin.money(unit * Math.min(bundle, fresh))), p -> svc.sell(p, bundle));
-            button(13, Material.GOLD_INGOT, "<yellow>カブを 64個 売る",
-                    List.of("<gray>+" + plugin.money(unit * Math.min(64, fresh))), p -> svc.sell(p, 64));
-            button(15, Material.GOLD_BLOCK, "<gold>全部売る",
-                    List.of("<gray>" + Msg.num(fresh) + "個 → +" + plugin.money(unit * fresh)),
-                    p -> svc.sell(p, -1));
-        } else {
-            ItemStack closed = icon(Material.BARRIER, "<red>営業時間外",
-                    List.of("<gray>日曜午後はお休み。", "<gray>月曜の朝から買取が始まるよ。"));
-            inventory.setItem(13, closed);
-        }
+        // ===== 左: 買う / 右: 売る を同じ画面に並べる =====
+        boolean canBuy = m.isSundayMorning();
+        boolean canSell = !m.isSunday();
+
+        // 見出し
+        inventory.setItem(2, icon(canBuy ? Material.LIME_STAINED_GLASS_PANE : Material.BLACK_STAINED_GLASS_PANE,
+                (canBuy ? "<green>" : "<gray>") + "◆ 買う（ウリ）",
+                List.of("<gray>日曜日の午前だけ買えるよ",
+                        "<gray>今週の販売価格: <white>" + plugin.priceText(market.priceAt(0)),
+                        canBuy ? "<green>● 営業中" : "<red>● 営業時間外")));
+        inventory.setItem(6, icon(canSell ? Material.YELLOW_STAINED_GLASS_PANE : Material.BLACK_STAINED_GLASS_PANE,
+                (canSell ? "<yellow>" : "<gray>") + "◆ 売る（買取）",
+                List.of("<gray>月曜〜土曜に売れるよ",
+                        canSell ? "<gray>今の買取価格: <white>" + plugin.priceText(market.priceAt(m.slot()))
+                                : "<gray>買取価格: <white>月曜の朝に発表",
+                        canSell ? "<green>● 営業中" : "<red>● 営業時間外")));
+
+        // 買うボタン（10, 11, 12）
+        double buyUnit = plugin.unitPrice(market.priceAt(0));
+        String buyClosed = "<red>今は買えないよ（日曜午前のみ）";
+        tradeButton(10, canBuy, Material.BEETROOT, "<green>" + bundle + "個 買う",
+                "<gray>" + plugin.money(buyUnit * bundle), buyClosed, p -> svc.buy(p, bundle));
+        tradeButton(11, canBuy, Material.BEETROOT, "<green>" + bundle * 10 + "個 買う",
+                "<gray>" + plugin.money(buyUnit * bundle * 10), buyClosed, p -> svc.buy(p, bundle * 10));
+        tradeButton(12, canBuy, Material.HAY_BLOCK, "<gold>買えるだけ買う",
+                "<gray>所持金と持ち物の空きの分だけ", buyClosed, p -> svc.buy(p, -1));
+
+        // 売るボタン（14, 15, 16）
+        double sellUnit = canSell ? plugin.unitPrice(market.priceAt(m.slot())) : 0;
+        String sellClosed = "<red>今は売れないよ（月〜土のみ）";
+        tradeButton(14, canSell, Material.GOLD_NUGGET, "<yellow>" + bundle + "個 売る",
+                "<gray>+" + plugin.money(sellUnit * Math.min(bundle, fresh)), sellClosed, p -> svc.sell(p, bundle));
+        tradeButton(15, canSell, Material.GOLD_INGOT, "<yellow>64個 売る",
+                "<gray>+" + plugin.money(sellUnit * Math.min(64, fresh)), sellClosed, p -> svc.sell(p, 64));
+        tradeButton(16, canSell, Material.GOLD_BLOCK, "<gold>全部売る",
+                "<gray>" + Msg.num(fresh) + "個 → +" + plugin.money(sellUnit * fresh), sellClosed, p -> svc.sell(p, -1));
+
+        // 真ん中の仕切り
+        inventory.setItem(13, icon(Material.WHITE_STAINED_GLASS_PANE, " ", List.of()));
 
         // 所持金
         inventory.setItem(22, icon(Material.SUNFLOWER, "<gold>所持金: " + plugin.money(balance),
@@ -110,6 +126,20 @@ public final class KabuMenu implements InventoryHolder {
         lore.add("<dark_aqua>今週のカブ価");
         lore.addAll(plugin.weekChart(m, false));
         return icon(Material.CLOCK, "<yellow>カブ価情報", lore);
+    }
+
+    /** 売買ボタン。営業時間外は灰色で表示（押すと理由をチャットで案内） */
+    private void tradeButton(int slot, boolean open, Material mat, String name, String detail,
+                             String closedText, Consumer<Player> action) {
+        if (open) {
+            button(slot, mat, name, List.of(detail, "", "<white>クリックで実行"), action);
+        } else {
+            button(slot, Material.GRAY_DYE, stripTags(name), List.of(closedText), action);
+        }
+    }
+
+    private static String stripTags(String mini) {
+        return "<gray>" + mini.replaceAll("<[^>]+>", "");
     }
 
     private void button(int slot, Material mat, String name, List<String> lore, Consumer<Player> action) {
