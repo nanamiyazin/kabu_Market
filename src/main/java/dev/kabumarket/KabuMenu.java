@@ -89,8 +89,8 @@ public final class KabuMenu implements InventoryHolder {
         String buyClosed = "<red>今は買えないよ（日曜午前のみ）";
         tradeButton(10, canBuy, Material.BEETROOT, "<green>" + bundle + "個 買う",
                 "<gray>" + plugin.money(buyUnit * bundle), buyClosed, p -> svc.buy(p, bundle));
-        tradeButton(11, canBuy, Material.BEETROOT, "<green>" + bundle * 10 + "個 買う",
-                "<gray>" + plugin.money(buyUnit * bundle * 10), buyClosed, p -> svc.buy(p, bundle * 10));
+        tradeButton(11, canBuy, Material.BEETROOT, "<green>64個 買う",
+                "<gray>" + plugin.money(buyUnit * 64), buyClosed, p -> svc.buy(p, 64, false));
         tradeButton(12, canBuy, Material.HAY_BLOCK, "<gold>買えるだけ買う",
                 "<gray>所持金と持ち物の空きの分だけ", buyClosed, p -> svc.buy(p, -1));
 

@@ -47,6 +47,14 @@ public final class KabuService {
 
     /** @param amount 買いたい個数。-1 なら買えるだけ */
     public void buy(Player p, int amount) {
+        buy(p, amount, true);
+    }
+
+    /**
+     * @param amount        買いたい個数。-1 なら買えるだけ
+     * @param enforceBundle false なら bundle-size 単位でなくても買える（GUI の64個ボタン用）
+     */
+    public void buy(Player p, int amount, boolean enforceBundle) {
         MarketClock.Moment m = now();
         if (!m.isSundayMorning()) {
             p.sendMessage(Msg.chat("<red>カブ売りのウリは <yellow>日曜日の午前</yellow> にしか来ないよ。"));
@@ -79,7 +87,7 @@ public final class KabuService {
                 return;
             }
         }
-        if (amount <= 0 || amount % bundle != 0) {
+        if (amount <= 0 || (enforceBundle && amount % bundle != 0)) {
             p.sendMessage(Msg.chat("<red>カブは " + bundle + " 個単位で買ってね。"));
             return;
         }
